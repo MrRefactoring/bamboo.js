@@ -8,11 +8,6 @@ import {
 export namespace AuthenticationService {
   export async function getAuthenticationToken(
     authentication: Config.Authentication | undefined,
-    requestData?: {
-      baseURL: string;
-      url: string;
-      method: string;
-    },
   ): Promise<string | undefined> {
     if (!authentication) {
       return undefined;

@@ -1,14 +1,17 @@
-import { Callback } from './callback';
+import { AuthenticationService } from '../services';
+import { Callback } from '../callback';
 import { Client } from './client';
-import { Config } from './config';
-import { RequestConfig } from './requestConfig';
-import axios, {AxiosInstance} from "axios";
-import {AuthenticationService} from "./services/authenticationService";
+import { Config } from '../config';
+import { RequestConfig } from '../requestConfig';
+import axios, { AxiosInstance } from 'axios';
 
-export class BambooClient implements Client {
+const ATLASSIAN_TOKEN_CHECK_FLAG = 'X-Atlassian-Token';
+const ATLASSIAN_TOKEN_CHECK_NOCHECK_VALUE = 'no-check';
+
+export class BaseClient implements Client {
   #instance: AxiosInstance | undefined;
 
-  protected urlSuffix = '/wiki/rest/';
+  protected urlSuffix = '/rest/api/latest';
 
   constructor(protected readonly config: Config) {}
 
@@ -69,13 +72,20 @@ export class BambooClient implements Client {
     this.#instance = axios.create({
       paramsSerializer: this.paramSerializer.bind(this),
       ...this.config.baseRequestConfig,
-      baseURL: `${this.config.host}${this.urlSuffix}`,
+      baseURL: `${this.getNormalizedHost()}${this.urlSuffix}`,
       headers: this.removeUndefinedProperties({
+        [ATLASSIAN_TOKEN_CHECK_FLAG]: this.config.noCheckAtlassianToken ? ATLASSIAN_TOKEN_CHECK_NOCHECK_VALUE : undefined,
         ...this.config.baseRequestConfig?.headers,
       }),
     });
 
     return this.#instance;
+  }
+
+  private getNormalizedHost() {
+    const url = new URL(this.config.host);
+
+    return url.toString().slice(0, -1);
   }
 
   async sendRequest<T>(requestConfig: RequestConfig, callback: never): Promise<T>;
@@ -86,11 +96,7 @@ export class BambooClient implements Client {
         ...requestConfig,
         headers: this.removeUndefinedProperties({
           Accept: 'application/json',
-          Authorization: await AuthenticationService.getAuthenticationToken(this.config.authentication, {
-            baseURL: this.config.host,
-            url: this.instance.getUri(requestConfig),
-            method: requestConfig.method!,
-          }),
+          Authorization: await AuthenticationService.getAuthenticationToken(this.config.authentication),
           ...requestConfig.headers,
         }),
       };
@@ -106,6 +112,8 @@ export class BambooClient implements Client {
 
       return responseHandler(response.data);
     } catch (e: any) {
+      const err = e.isAxiosError ? e.response.data : e;
+
       const callbackErrorHandler = callback && ((error: Config.Error) => callback(error));
       const defaultErrorHandler = (error: Error) => {
         throw error;
@@ -113,9 +121,9 @@ export class BambooClient implements Client {
 
       const errorHandler = callbackErrorHandler ?? defaultErrorHandler;
 
-      this.config.middlewares?.onError?.(e);
+      this.config.middlewares?.onError?.(err);
 
-      return errorHandler(e);
+      return errorHandler(err);
     }
   }
 }

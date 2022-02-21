@@ -7,6 +7,8 @@ export interface Config {
   baseRequestConfig?: Config.BaseRequestConfig;
   authentication?: Config.Authentication;
   middlewares?: Config.Middlewares;
+  /** Adds `'X-Atlassian-Token': 'no-check'` to each request header */
+  noCheckAtlassianToken?: boolean;
 }
 
 export namespace Config {
