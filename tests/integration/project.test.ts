@@ -34,7 +34,7 @@ test.serial('should get all projects', async t => {
   t.truthy(projects.projects.size >= 1);
 });
 
-test.serial(`should get ${projectKey} project`, async t => {
+test.serial.skip(`should get ${projectKey} project`, async t => {
   const project = await client.project.getProject({ key: projectKey });
 
   t.is(project.expand, 'plans');
@@ -46,7 +46,7 @@ test.serial(`should get ${projectKey} project`, async t => {
   t.is(project.plans?.['max-result'], 0);
 });
 
-test.serial(`should create ${projectKey} project repository`, async t => { // TODO
+test.serial.skip(`should create ${projectKey} project repository`, async t => { // TODO
   await client.project.createProjectRepository({ key: projectKey });
 
   t.pass();

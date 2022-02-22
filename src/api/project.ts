@@ -3,7 +3,6 @@ import * as Parameters from './parameters';
 import { Callback } from '../callback';
 import { Client } from '../clients';
 import { RequestConfig } from '../requestConfig';
-import { Mode } from 'fs';
 
 export class Project {
   constructor(private client: Client) {}
