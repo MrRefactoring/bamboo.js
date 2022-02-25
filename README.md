@@ -1,5 +1,5 @@
 <div align="center">
-  <img alt="Bamboo.js logo" src="https://svgshare.com/i/Vrj.svg"/>
+  <img alt="Bamboo.js logo" src="https://svgshare.com/i/eWq.svg"/>
 
 <a href="https://www.npmjs.com/package/bamboo.js"><img alt="NPM version" src="https://img.shields.io/npm/v/bamboo.js.svg?maxAge=3600&style=flat-square" /></a>
 <a href="https://www.npmjs.com/package/bamboo.js"><img alt="NPM downloads per month" src="https://img.shields.io/npm/dm/bamboo.js.svg?maxAge=3600&style=flat-square" /></a>
